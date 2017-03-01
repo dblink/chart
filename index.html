@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/common.css"/>
+    <style>
+        /*.canvas-group {
+            background: #00b3ee;
+        }*/
+        .table{
+            width: 1000px;
+            margin: auto;
+        }
+        .canvas-dot {
+            background: #00d6b2;
+            cursor: pointer;
+        }
+        .canvas-dot:hover{
+            background: #00b3ee;
+        }
+        .line{
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="clear-both text-center">
+    <div class="relative table">
+        <canvas class="canvas" width="1000" height="600">请更新您的浏览器</canvas>
+        <canvas class="line" width="1000" height="600">请更新您的浏览器</canvas>
+    </div>
+</div>
+
+
+<script src="js/jquery-1.10.1.min.js"></script>
+<script src="js/canvas.js"></script>
+<!--<script>
+    (function ($){
+        $.ajax({
+            url: "localhost:3000/",
+            success:function(e){
+                console.log(e);
+            }
+        })
+    })(jQuery)
+</script>-->
+</body>
+</html>
