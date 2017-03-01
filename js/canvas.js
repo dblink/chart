@@ -12,6 +12,9 @@
   function Chart(json){
     this.id = json.id;
     this.class = json.class;
+    this.element = json.element;
+    this.data = json.data;
+    this.color = json.color ? json.color : "grey";
   }
 
   Chart.prototype = {
@@ -58,7 +61,6 @@
       });
     },
     line: function(){
-      var list= [[100,300,400,500,600,700,100,200,400,500,200,300],[1000,1200,400,500,300,200, 0]];
       var base = 100;
       var _this = this;
       var _canvas = this._canvas();
@@ -66,16 +68,18 @@
       if(!_context){
         return;
       }
-      list.map(function(line,key){
-        _context.beginPath();
-        _context.moveTo(_this._marginX, _this.height - _this._marginY);
-        list[key].map(function(e, key){
-          _context.lineTo(_this._marginX*(key+2), _this.height- _this._marginY*(e/base+1));
-        });
-        _context.lineWidth= 1;
-        _context.strokeStyle = "red";
-        _context.stroke();
+      var list = _this.data;
+      _context.beginPath();
+      _context.moveTo(_this._marginX, _this.height - _this._marginY);
+      list.map(function(e, key){
+        _context.lineTo(_this._marginX*(key+2), _this.height- _this._marginY*(e/base+1));
       });
+      _context.lineWidth= 2;
+      _context.strokeStyle = this.color;
+      _context.stroke();
+
+    },
+    dot: function(){
 
     },
     _canvas: function (){
@@ -84,6 +88,10 @@
       }
       if (this.class){
         return document.getElementsByClassName(this.class)[0];
+      }
+      if (this.element){
+        console.log(this.element);
+        return this.element;
       }
       console.log("next Elements! class or id");
       return false;
@@ -100,7 +108,23 @@
     class: "canvas"
   });
   bg.background();
-  bg.class = "line";
-  bg.line();
-  /*chart();*/
+  var list= [
+    [100, 300, 400, 500, 600, 700, 100, 200, 400, 500, 200, 300],
+    [1000, 1200, 400, 500, 300, 200, 0, 0, 20],
+    [1000, 1000, 300, 100, 100, 600]
+  ];
+  var color= ['red', 'blue', 'green'];
+  list.map(function(e,key){
+    var _canvas = document.createElement('canvas');
+    var _group = document.getElementsByClassName("canvasGroup")[0];
+    _canvas.height = 600;
+    _canvas.width = 1000;
+    _canvas.className = "line";
+    bg.class = "";
+    bg.data = e;
+    bg.element = _canvas;
+    bg.color = color[key];
+    bg.line();
+    _group.appendChild(_canvas);
+  });
 })();
