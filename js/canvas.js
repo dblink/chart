@@ -18,6 +18,15 @@
   }
 
   Chart.prototype = {
+    generate: function (){
+      var _canvas = document.createElement('canvas');
+      _canvas.height = 600;
+      _canvas.width = 1000;
+      _canvas.className = this.className;
+      this.element = _canvas;
+      this.class = "";
+      return _canvas;
+    },
     background: function (){
       var list = [
         "0","100","200","300",
@@ -127,15 +136,12 @@
   ];
   var color= ['red', 'blue', 'green'];
   list.map(function(e,key){
-    var _canvas = document.createElement('canvas');
+    var _canvas;
     var _group = document.getElementsByClassName("canvasGroup")[0];
-    _canvas.height = 600;
-    _canvas.width = 1000;
-    _canvas.className = "line";
-    bg.class = "";
+    bg.className = "line";
     bg.data = e;
-    bg.element = _canvas;
     bg.color = color[key];
+    _canvas = bg.generate();
     bg.line();
     bg.chartDot();
     _group.appendChild(_canvas);
