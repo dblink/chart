@@ -79,8 +79,21 @@
       _context.stroke();
 
     },
-    dot: function(){
-
+    chartDot: function(){
+      var _this = this;
+      var _dot = _this.data;
+      var base = 100;
+      _dot.map(function(e, key){
+        _this._dot(_this._marginX *(key+2) , _this.height - _this._marginY * (e/base+1))
+      })
+    },
+    _dot: function(x,y){
+      var _canvas = this._canvas();
+      var _context = _canvas.getContext("2d");
+      _context.beginPath();
+      _context.arc(x,y,3,0,2*Math.PI);
+      _context.fillStyle = this.color;
+      _context.fill()
     },
     _canvas: function (){
       if (this.id){
@@ -90,7 +103,6 @@
         return document.getElementsByClassName(this.class)[0];
       }
       if (this.element){
-        console.log(this.element);
         return this.element;
       }
       console.log("next Elements! class or id");
@@ -125,6 +137,11 @@
     bg.element = _canvas;
     bg.color = color[key];
     bg.line();
+    bg.chartDot();
     _group.appendChild(_canvas);
   });
+  /*var _div = document.getElementsByClassName("canvasGroup")[0];
+  _div.addEventListener("mousemove",function(e){
+    console.log(e.layerX, e.layerY);
+  },true)*/
 })();
