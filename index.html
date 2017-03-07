@@ -12,6 +12,16 @@
             width: 1000px;
             margin: auto;
         }
+        .dataList{
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.49);
+            color: #fff;
+            display: none;
+            font-size: 14px;
+            z-index: 2;
+        }
         .canvas-dot {
             background: #00d6b2;
             cursor: pointer;
@@ -24,12 +34,21 @@
             top: 0;
             left: 0;
         }
+        .dot{
+            background: red;
+            cursor: pointer;
+            transition: .5s background;
+        }
+        .dot:hover{
+            background: #fff;
+        }
     </style>
 </head>
 <body>
 <div class="clear-both text-center">
     <div class="relative table canvasGroup">
         <canvas class="canvas" width="1000" height="600">请更新您的浏览器</canvas>
+        <div class="dataList"></div>
     </div>
 </div>
 
