@@ -12,6 +12,7 @@
     this.saveContext = this._canvas().getContext('2d');
     this._pathDot = [];
     this.base = json.base ? json.base : 100;
+    this.hiddenKey = [];
   }
 
   Chart.prototype = {
@@ -26,11 +27,10 @@
     },
 
     background: function (){
-      var list = [
-        "0", "100", "200", "300",
-        "400", "500", "600", "700",
-        "800", "900", "1000", "1100", "1200"
-      ];
+      var list = [];
+      for (var i = 0; i < 13; i++){
+        list.push(i * this.base);
+      }
       var month = ["0月", "1月份", "2月份", "3月份", "4月份", "5月份", "6月份", "7月份",
         "8月份", "9月份", "10月份", "11月份", "12月份"];
       var _canvas = this._canvas();
@@ -55,7 +55,7 @@
         _context.moveTo(_this._marginX * (key + 1), _this.height - _this._marginY);
         _context.lineTo(_this._marginX * (key + 1), _this.height - _monthLength * _this._marginY);
         _context.lineWidth = 1;
-        _context.strokeStyle = "grey";
+        _context.strokeStyle = "#f1f1f1"; //背景的颜色
         _context.stroke();
         _context.beginPath();
         _context.moveTo(_this._marginX, _this.height - (_this._marginY * (key + 1)));
@@ -69,7 +69,7 @@
     },
 
     line: function (){
-      var base = 100;
+      var base = this.base;
       var _this = this;
       var _canvas = this._canvas();
       var _context = _canvas.getContext("2d");
@@ -84,7 +84,7 @@
       list.map(function (e, key){
         _context.lineTo(_this._marginX * (key + 2), _this.height - _this._marginY * (e / base + 1));
       });
-      _context.lineWidth = 2;
+      _context.lineWidth = 1.5; //线宽
       _context.strokeStyle = this.color;
       _context.stroke();
     },
@@ -111,14 +111,14 @@
     chartDot: function (){
       var _this = this;
       var _dot = _this.data;
-      var base = 100;
+      var base = this.base;
       var _context = this.dotContext = this._canvas().getContext("2d");
       _context.beginPath();
       _dot.map(function (e, key){
         _this._drawDot(_this._marginX * (key + 2), _this.height - _this._marginY * (e / base + 1));
         _this._pathDot.push({x: _this._marginX * (key + 2), y: _this.height - _this._marginY * (e / base + 1)});
       });
-      _context.fillStyle = "#fff";
+      _context.fillStyle = "#dddddd"; //点的颜色
       _context.fill();
     },
 
@@ -146,7 +146,7 @@
 
     _drawDot: function (x, y, r){
       var _context = this.dotContext;
-      r = r ? r : 5;
+      r = r ? r : 4;
       this.saveContext.moveTo(x, y);
       this.saveContext.arc(x, y, r, 0, 2 * Math.PI);
       _context.moveTo(x, y);
@@ -164,54 +164,74 @@
 
     dataSum: function (x, y, data){
       var _div = document.getElementsByClassName("dataList")[0];
-      if(x+ 110 + bg._marginX > bg.width ){
-        _div.style.right = (bg.width- x + 10) + "px";
-        _div.style.left = "auto";
-      }else{
-        _div.style.left = (x+10)+"px";
-        _div.style.right = "auto";
-      }
-      if(y+ 110 + bg._marginY > bg.height){
-        _div.style.bottom =  (bg.height- y + 10) + "px";
-        _div.style.top = "auto";
-      }else{
-        _div.style.bottom =  "auto";
-        _div.style.top = (y+10)+"px";
-      }
-
       _div.style.display = "block";
       _div.innerHTML = "";
-      var _p= "";
+      var _p = "";
+      var _this = this;
       data.map(function (line, key){
-        _p += "<p>xxx</p><p>总金额</p><p>"+ line.money +"</p>";
+        if (_this.hiddenKey.indexOf(line.key) !== -1){
+          return
+        }
+        _p += "<p>xxx</p><p>总金额</p><p>" + line.money + "</p>";
       });
       _div.innerHTML = _p;
+      if (x + 10 + _div.offsetWidth + bg._marginX > bg.width){
+        _div.style.right = (bg.width - x + 10) + "px";
+        _div.style.left = "auto";
+      }else{
+        _div.style.left = (x + 10) + "px";
+        _div.style.right = "auto";
+      }
+      if (y + 10 + _div.offsetHeight + bg._marginY > bg.height){
+        _div.style.bottom = (bg.height - y + 10) + "px";
+        _div.style.top = "auto";
+      }else{
+        _div.style.bottom = "auto";
+        _div.style.top = (y + 10) + "px";
+      }
     },
-    hideData:function(){
+
+    hover: function (point, list, position){
+      var isPoint = [];
+      var _this = this;
+      list.map(function (list, key){
+        var _nowLayer = (_this.height - point.layerY - _this._marginY) / _this._marginY;
+        var _point = list[position - 2] / bg.base;
+        var _diff = Math.abs(_nowLayer - _point);
+        _nowLayer = _point = null;
+        if (_diff < .3){
+          if (_this.hiddenKey.indexOf(key) !== -1){
+            return;
+          }
+          isPoint.push({key: key, money: list[position - 2]})
+        }
+        _diff = null;
+      });
+      return isPoint;
+    },
+
+    hideData: function (){
       var _div = document.getElementsByClassName("dataList")[0];
       _div.style.display = "none";
     }
   };
 
   var bg = new Chart({
-    class: "canvas"
+    class: "canvas",
+    base: 100
   });
   bg.background();
-  /*var list=[
-   [100, 300, 400, 500, 600, 700, 100, 200, 400, 500, 200, 300]
-   ,[700, 100, 200, 400, 500, 200, 300,100, 300, 400, 500, 600, 700, 100]
-   ,[100, 300, 400, 500, 600, 700, 100,100, 300, 400, 500, 600, 700, 100]
-   ,[100, 300, 400, 300, 400, 1000, 100, 200, 400, 500, 200, 100]
-   ,[700, 100, 200, 400,400, 500,  300,100, 300, 400, 500, 600, 700, 100]
-   ,[100, 300, 400, 500, 600, 700, 100,100, 300, 400, 500, 600, 700, 100]
-   ,[100, 300, 400, 500, 600, 700, 100, 200, 400, 500, 200, 300]
-   ];*/
   var list = [
-    [50, 300, 400, 500, 600, 700, 100, 200, 400, 500, 200, 300]
-    , [700, 100, 200, 400, 600, 200, 300, 100, 300, 400, 500, 600]
-    , [500, 250, 100, 401, 600, 200, 300, 100, 300, 400, 500, 600]
+    [0, 0, 400, 500, 600, 700, 100, 200, 400, 500, 200, 300]
+    , [700, 100, 200, 400, 500, 200, 300, 100, 300, 400, 500, 600]
+    , [100, 300, 400, 500, 600, 700, 100, 100, 300, 400, 500, 600]
+    , [100, 300, 400, 300, 400, 1000, 100, 200, 400, 500, 200, 100]
+    , [700, 100, 200, 400, 400, 500, 300, 100, 300, 400, 500, 600]
+    , [100, 300, 400, 500, 600, 700, 100, 100, 300, 400, 500, 600]
+    , [100, 300, 400, 500, 600, 700, 100, 200, 400, 500, 200, 300]
+    , [200, 400, 500, 600, 700, 100, 200, 300, 400, 600, 300, 400]
   ];
-  var color = ['red', 'blue', 'green', "grey", "yellow", "#12345a", "#123", "#cdcdcd"];
+  var color = ['#A849AC', '#EA533F', '#1667A9', "#FFCD01", "#4CD990", "brown", "pink", "orange"];
   var _canvas;
   var _group = document.getElementsByClassName("canvasGroup")[0];
   bg.className = "line";
@@ -223,33 +243,24 @@
     bg.chartDot();
     _group.appendChild(_canvas);
   });
-
+  /*bg.hiddenKey = [1,4];*/
   _canvas = bg.generateLineCanvas();
   _group.appendChild(_canvas);
-
   var last = {x: 0, y: 0};
   _canvas.addEventListener("mousemove", function (e){
     var _json = bg.isPath(e.layerX, e.layerY);
     if (_json.inPath){
-      this.style.cursor = "pointer";
       if (Math.abs(e.layerX - last.x) < 10 && Math.abs(e.layerY - last.y) < 10){
         return;
       }
       last.x = e.layerX;
       last.y = e.layerY;
-      var isPoint = [];
-      list.map(function (list, key){
-        var _nowLayer = (bg.height - e.layerY - bg._marginY) / bg._marginY;
-        var _point = list[_json.position - 2] / bg.base;
-        var _diff = Math.abs(_nowLayer - _point);
-        _nowLayer = _point = null;
-        if (_diff < .3){
-          isPoint.push({key: key, money: list[_json.position - 2]})
-        }
-        _diff = null;
-      });
-      bg.drawDot(_json.position * bg._marginX, bg.height - (isPoint[0].money / bg.base + 1) * bg._marginY, 4);
-      bg.dataSum(_json.position * bg._marginX, bg.height - (isPoint[0].money / bg.base + 1) * bg._marginY, isPoint);
+      var isPoint = bg.hover(e, list, _json.position);
+      if (isPoint.length){
+        this.style.cursor = "pointer";
+        bg.drawDot(_json.position * bg._marginX, bg.height - (isPoint[0].money / bg.base + 1) * bg._marginY, 3);
+        bg.dataSum(_json.position * bg._marginX, bg.height - (isPoint[0].money / bg.base + 1) * bg._marginY, isPoint);
+      }
     }else{
       last = {x: 0, y: 0};
       bg.clear();
